@@ -1,3 +1,5 @@
+open Slurmcaml.Matrixutils
+
 (* reads int matrix from a file and returns the matrix, # rows, # columns,
    valuetype*)
 let read_int_matrix_from_file pathname =
@@ -5,7 +7,7 @@ let read_int_matrix_from_file pathname =
   let arrayrows =
     List.map (fun x -> Array.of_list (List.map int_of_string x)) csv
   in
-  Array.of_list arrayrows
+  IntMatrix (Array.of_list arrayrows)
 
 (* reads float matrix from a file, returns the matrix, # of rows, # of columsn,
    valuetype*)
@@ -14,7 +16,17 @@ let read_float_matrix_from_file pathname =
   let arrayrows =
     List.map (fun x -> Array.of_list (List.map float_of_string x)) csv
   in
-  Array.of_list arrayrows
+  FloatMatrix (Array.of_list arrayrows)
+
+let process_job out_channel job = Lwt.return ()
+(* job should be a string with first the type of the matrix, which tells you
+   which read function to use. then, it should have the operation to perform,
+   which tells you whether you should only read one matrix (transpose, scale),
+   or 2 matrices for anything else. then, it should give the file path(s). this
+   should print to the outchannel first the type of the matrix, then the
+   operation to perform, then the first matrix, using [print_matrix] from matrix
+   utils, then the word "done", then the second matrix if the operation
+   requires, also using [print_matrix], then the word done*)
 
 let run_client ipaddr port =
   let head () =
@@ -29,7 +41,7 @@ let run_client ipaddr port =
       match%lwt Lwt_io.read_line_opt Lwt_io.stdin with
       | Some job ->
           let%lwt () = Lwt_io.printlf "Sending job: %s" job in
-          let%lwt () = Lwt_io.write_line server_out job in
+          let%lwt () = process_job server_out job in
           let%lwt () = Lwt_io.flush server_out in
           send_job ()
       | None -> Lwt.return_unit
