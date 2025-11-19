@@ -1,3 +1,21 @@
+(* reads int matrix from a file and returns the matrix, # rows, # columns,
+   valuetype*)
+let read_int_matrix_from_file pathname =
+  let csv = Csv.load pathname in
+  let arrayrows =
+    List.map (fun x -> Array.of_list (List.map int_of_string x)) csv
+  in
+  Array.of_list arrayrows
+
+(* reads float matrix from a file, returns the matrix, # of rows, # of columsn,
+   valuetype*)
+let read_float_matrix_from_file pathname =
+  let csv = Csv.load pathname in
+  let arrayrows =
+    List.map (fun x -> Array.of_list (List.map float_of_string x)) csv
+  in
+  Array.of_list arrayrows
+
 let run_client ipaddr port =
   let head () =
     let%lwt () = Lwt_io.printlf "Connected to Server as CLIENT node" in
