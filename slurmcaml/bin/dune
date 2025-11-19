@@ -1,5 +1,5 @@
 (executable
  (public_name slurmcaml)
- (name main)
+ (name server)
  (libraries slurmcaml lwt.unix)
  (preprocess (pps lwt_ppx)))
