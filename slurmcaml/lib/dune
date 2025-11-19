@@ -1,2 +1,2 @@
 (library
- (name slurmcaml))
+ (name slurmcaml) (libraries lwt.unix) (preprocess (pps lwt_ppx)))
