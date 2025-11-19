@@ -1,5 +1,8 @@
 open Slurmcaml.Functions
 
+(* TODO stuff: evaluate functions and implement map, do error checking on
+   matrices, fix usage stuff at bottom*)
+
 (* unix util funcs *)
 let sock_addr_to_string (add : Unix.sockaddr) =
   match add with
@@ -9,7 +12,21 @@ let sock_addr_to_string (add : Unix.sockaddr) =
 let format_status_string status job output =
   Printf.sprintf "%s|%s|%s" status job output
 
-(** Matrix util functions *)
+(*Map util functions*)
+type expr =
+  | Const of float
+  | Var of string
+  | Add of expr * expr
+  | Sub of expr * expr
+  | Mul of expr * expr
+  | Div of expr * expr
+  | Pow of expr * expr
+  | Neg of expr
+  | Func of string * expr
+
+(*TODO: evaluate functions & implement MAP*)
+
+(* Matrix util functions *)
 type result =
   | IntMatrix of int array array
   | FloatMatrix of float array array
@@ -127,6 +144,10 @@ let run_client ipaddr port instanceName =
                     Lwt.return
                       (IntMatrix
                          (IntegerMatrixOperations.scale (int_of_string k) mat))
+                | "transpose" ->
+                    let%lwt mat = read_int_matrix_input server_in in
+                    Lwt.return
+                      (IntMatrix (IntegerMatrixOperations.transpose mat))
                 | _ -> failwith "not an implemented function")
             | "float" -> (
                 match job with
@@ -151,6 +172,10 @@ let run_client ipaddr port instanceName =
                     Lwt.return
                       (FloatMatrix
                          (FloatMatrixOperations.scale (float_of_string k) mat))
+                | "transpose" ->
+                    let%lwt mat = read_float_matrix_input server_in in
+                    Lwt.return
+                      (FloatMatrix (FloatMatrixOperations.transpose mat))
                 | _ -> failwith "not an implemented function")
             | _ -> failwith "not an implemented type"
           in

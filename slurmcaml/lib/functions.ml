@@ -7,6 +7,8 @@ module type MatrixOperations = sig
   val subtract : t array array -> t array array -> t array array
   val multiply : t array array -> t array array -> t array array
   val scale : t -> t array array -> t array array
+  val transpose : t array array -> t array array
+  val map : (t -> 'a) -> t array array -> 'a array array
 end
 
 module IntegerMatrixOperations : MatrixOperations with type t = int = struct
@@ -57,6 +59,11 @@ module IntegerMatrixOperations : MatrixOperations with type t = int = struct
 
   let scale k mat1 =
     Array.init (Array.length mat1) (fun i -> scale_row k mat1.(i))
+
+  let transpose mat1 =
+    Array.init (Array.length mat1.(0)) (fun i -> extract_column i mat1)
+
+  let map f mat1 = Array.map (fun x -> Array.map f x) mat1
 end
 
 module FloatMatrixOperations : MatrixOperations with type t = float = struct
@@ -107,4 +114,9 @@ module FloatMatrixOperations : MatrixOperations with type t = float = struct
 
   let scale k mat1 =
     Array.init (Array.length mat1) (fun i -> scale_row k mat1.(i))
+
+  let transpose mat1 =
+    Array.init (Array.length mat1.(0)) (fun i -> extract_column i mat1)
+
+  let map f mat1 = Array.map (fun x -> Array.map f x) mat1
 end
