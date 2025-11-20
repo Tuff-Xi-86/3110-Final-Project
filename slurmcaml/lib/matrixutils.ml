@@ -4,6 +4,7 @@ type result =
   | IntMatrix of int array array
   | FloatMatrix of float array array
 
+(*prints a matrix, type checking against IntMatrix and FloatMatrix*)
 let print_matrix res channel =
   match res with
   | IntMatrix mat ->
@@ -65,12 +66,12 @@ let read_int_matrix_input channel =
   let%lwt () = set_row 0 in
   Lwt.return mat
 
-(** BROKEN IN MAT, FIX LATER*)
 let read_float_matrix_input channel =
   let%lwt row = Lwt_io.read_line channel in
   let%lwt columns = Lwt_io.read_line channel in
   let mat =
-    Array.make (int_of_string row) (Array.make (int_of_string columns) 0.0)
+    Array.init (int_of_string row) (fun _ ->
+        Array.make (int_of_string columns) 0.0)
   in
   let rec set_row i =
     let%lwt line = Lwt_io.read_line channel in
